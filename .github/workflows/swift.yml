@@ -28,6 +28,7 @@ jobs:
      - name: checkout the code
        uses: actions/checkout@v4
 
+
      - name: Run Unit Tests
        run: xcodebuild -project lint-test-ios.xcodeproj -scheme lint-test-ios -destination 'platform=iOS Simulator,name=iPhone 14' test
-       working-directory: _MACOSX/lint-test-ios
+       working-directory: lint-test-ios
