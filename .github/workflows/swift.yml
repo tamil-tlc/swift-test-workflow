@@ -29,4 +29,5 @@ jobs:
        uses: actions/checkout@v4
 
      - name: Run Unit Tests
-       run: xcodebuild -project lint-test-ios.xcodeproj -scheme lint-test-ios -destination 'platform=macOS' test
+       run: xcodebuild -lint-test-ios.xcodeproj -scheme lint-test-ios -destination 'platform=macOS' test
+       working-directory: _MACOSX/lint-test-ios
