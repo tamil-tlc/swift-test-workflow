@@ -28,7 +28,9 @@ jobs:
      - name: checkout the code
        uses: actions/checkout@v4
 
-
-     - name: Run Unit Tests
-       run: xcodebuild -project lint-test-ios.xcodeproj -scheme lint-test-ios -destination 'platform=iOS Simulator,name=iPhone 14' test
-       working-directory: lint-test-ios
+     - name: swift tests
+       run: |
+          xcodebuild clean build test \
+            -project lint-test-ios.xcodeproj \ # or use -workspace if using CocoaPods/SwiftPM/XCWorkspace
+            -scheme YourScheme \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
