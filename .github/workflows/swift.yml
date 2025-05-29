@@ -28,5 +28,6 @@ jobs:
      - name: checkout the code
        uses: actions/checkout@v4
 
-     - name: Run tests
-       run: xcodebuild -scheme MyAppScheme -destination 'platform=macOS' test
+     - name: Run tests with xcodebuild
+       run: xcodebuild -lint-test-ios.xcodeproj -scheme MyAppScheme -destination 'platform=macOS' test
+       working-directory: _MACOS/lint-test-ios
