@@ -53,12 +53,12 @@ jobs:
      #- name: Install CocoaPods
       # run: pod install
 
-     - name: build with xcode
+     - name: Build with xcode
        run: |
          xcodebuild test \
-         -workspace lint-test-ios.xcodeproj \
+         -project lint-test-ios.xcodeproj \
          -scheme lint-test-ios \
          -sdk iphonesimulator \
-         -destination 'platform=iOS simulator,name=iphone 14'
+         -destination 'platform=iOS Simulator,name=iPhone 14'
          
      
