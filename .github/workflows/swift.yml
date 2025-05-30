@@ -20,20 +20,25 @@ jobs:
     - name: run swiftlint
       run: swiftlint
 
-  #unit-test:
-   # needs: lint
-   # runs-on: macos-latest
+  unit-test:
+    needs: lint
+    runs-on: macos-latest
 
-   # steps:
-     #- name: checkout the code
-      # uses: actions/checkout@v4
+    steps:
+     - name: checkout the code
+       uses: actions/checkout@v4
 
-    # - name: swift tests
-     #  run: |
-        #  xcodebuild clean build test \
-           # -project lint-test-ios.xcodeproj \ # or use -workspace if using CocoaPods/SwiftPM/XCWorkspace
-            #-scheme lint-test-ios \
-            #-destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+     - name: List schemes
+       run: |
+          xcodebuild -list -project lint-test-ios.xcodeproj
+
+     - name: Run unit tests
+       run: |
+          xcodebuild clean build test \
+            -project lint-test-ios.xcodeproj \
+            -scheme lint-test-ios \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14'
 
 
  # build:
@@ -66,42 +71,4 @@ jobs:
          #-scheme lint-test-ios \
          #-sdk iphonesimulator \
          #-destination 'platform=iOS Simulator,name=iPhone 14'
-         
-  build-test-lint:
-       needs: lint
-       runs-on: macos-14 # macOS with Xcode 15.4
-
-       steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
-
-        - name: Set up Ruby for CocoaPods (optional)
-          uses: ruby/setup-ruby@v1
-          with:
-           ruby-version: '3.1'
-
-        - name: Install CocoaPods dependencies (if using Pods)
-          run: |
-           cd lint-test-ios
-           pod install || echo "No Podfile found, skipping..."
-
-        - name: List available simulators (for debugging)
-          run: xcrun simctl list devices
-
-        - name: Build and test
-          run: |
-           cd lint-test-ios
-           xcodebuild clean build test \
-            -project lint-test-ios.xcodeproj \ || echo "xcode not found"
-            -scheme lint-test-ios \ || echo "scheme not found"
-            -sdk iphonesimulator \ || echo "sdk not found"
-            -destination 'platform=iOS Simulator,name=iPhone 14' || echo "destination not found"
-
-        - name: Install SwiftLint
-          run: |
-           brew install swiftlint || echo "SwiftLint already installed"
-
-        - name: Run SwiftLint
-          run: |
-           cd lint-test-ios
-           swiftlint || echo "SwiftLint completed with warnings"
+ 
