@@ -44,10 +44,19 @@ jobs:
      - name: checkout the code
        uses: actions/checkout@v4
 
+       
+     - name: Set up Ruby for CocoaPods
+       uses: ruby/setup-ruby@v1
+       with:
+        ruby-version: '3.1'
+
+     - name: Install CocoaPods
+       run: pod install
+
      - name: build with xcode
        run: |
          xcodebuild test \
-         -workspace lint-test-ios.xcworkspace \
+         -workspace lint-test-ios.xcodeproj \
          -scheme lint-test-ios \
          -sdk iphonesimulator \
          -destination 'platform=iOS simulator,name=iphone 14'
