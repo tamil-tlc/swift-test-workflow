@@ -41,10 +41,10 @@ jobs:
 
      - name: Run Unit Tests
        run: |
-          xcodebuild test \
-            -project lint-test-ios/lint-test-ios.xcodeproj \
-            -scheme lint-test-ios \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+         xcodebuild test \
+         -project lint-test-ios/lint-test-ios.xcodeproj \
+         -scheme lint-test-ios \
+         -destination "platform=iOS Simulator,name=iPhone 15,OS=17.4"
             
               
   build:
