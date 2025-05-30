@@ -20,27 +20,24 @@ jobs:
     - name: run swiftlint
       run: swiftlint
 
-  unit-test:
-    needs: lint
-    runs-on: macos-latest
+  build-and-test:
+    runs-on: macos-14
 
     steps:
-     - name: checkout the code
-       uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-     - name: List schemes
-       run: |
-          xcodebuild -list -project lint-test-ios.xcodeproj || echo "list scheme show error"
+      - name: Show project directory (debug)
+        run: ls -R
 
-     - name: Run unit tests
-       run: |
+      - name: Run unit tests
+        run: |
           xcodebuild clean build test \
             -project lint-test-ios.xcodeproj \
             -scheme lint-test-ios \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 14'
-
-
+            -destination "platform=iOS Simulator,name=iPhone 14"
+   
  # build:
   #  needs: [lint]
    # runs-on: macos-latest
