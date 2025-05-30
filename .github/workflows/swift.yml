@@ -39,6 +39,9 @@ jobs:
      - name: check out the code
        uses: actions/checkout@v4
 
+     - name: Select Xcode Version
+       run: sudo xcode-select -s /Applications/Xcode_16.0.app
+
      - name: Run Unit Tests
        run: |
          xcodebuild test \
