@@ -20,17 +20,36 @@ jobs:
     - name: run swiftlint
       run: swiftlint
 
-  unit-test:
-    needs: lint
+  #unit-test:
+   # needs: lint
+   # runs-on: macos-latest
+
+   # steps:
+     #- name: checkout the code
+      # uses: actions/checkout@v4
+
+    # - name: swift tests
+     #  run: |
+        #  xcodebuild clean build test \
+           # -project lint-test-ios.xcodeproj \ # or use -workspace if using CocoaPods/SwiftPM/XCWorkspace
+            #-scheme lint-test-ios \
+            #-destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+
+
+  build:
+    needs: [lint]
     runs-on: macos-latest
 
     steps:
      - name: checkout the code
        uses: actions/checkout@v4
 
-     - name: swift tests
+     - name: build with xcode
        run: |
-          xcodebuild clean build test \
-            -project lint-test-ios.xcodeproj \ # or use -workspace if using CocoaPods/SwiftPM/XCWorkspace
-            -scheme YourScheme \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
+         xcodebuild test /
+         -workspace lint-test-ios.xcworkspace /
+         -scheme lint-test-ios /
+         -sdk iphonesimulator /
+         -destination 'platform=ios simulator, name=iphone 14'
+         
+     
