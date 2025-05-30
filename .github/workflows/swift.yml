@@ -25,9 +25,6 @@ jobs:
         run: swiftlint
         continue-on-error: true  # Set to false if you want to fail on lint warnings/errors
 
-      - name: Install Dependencies (if using SwiftPM)
-        run: swift package resolve
-
       - name: Build Project
         run: |
           xcodebuild clean build \
