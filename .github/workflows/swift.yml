@@ -50,6 +50,6 @@ jobs:
          -workspace lint-test-ios.xcworkspace \
          -scheme lint-test-ios \
          -sdk iphonesimulator \
-         -destination 'platform=ios simulator, name=iphone 14'
+         -destination 'platform=iOS simulator,name=iphone 14'
          
      
