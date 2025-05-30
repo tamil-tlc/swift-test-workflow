@@ -53,9 +53,9 @@ jobs:
      #- name: Install CocoaPods
       # run: pod install
 
-     - name: Build with xcode
+     - name: Run tests with xcodebuild
        run: |
-         xcodebuild test \
+         xcodebuild clean build test \
          -project lint-test-ios.xcodeproj \
          -scheme lint-test-ios \
          -sdk iphonesimulator \
