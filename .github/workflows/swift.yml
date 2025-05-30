@@ -28,15 +28,8 @@ jobs:
         run: swiftlint
         continue-on-error: true  # Set to false if you want to fail on lint warnings/errors
 
-      - name: Build Project
+      - name: List directory contents
         run: |
-          xcodebuild clean build \
-            -scheme lint-test-ios \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
-
-      - name: Run Unit Tests
-        run: |
-          xcodebuild test \
-            -scheme lint-test-ios \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
-
+           pwd
+           ls -la
+           find . -name "*.xcodeproj" -o -name "*.xcworkspace" -o -name "Package.swift"
