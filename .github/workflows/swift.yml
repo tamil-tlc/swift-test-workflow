@@ -46,10 +46,10 @@ jobs:
 
      - name: build with xcode
        run: |
-         xcodebuild test /
-         -workspace lint-test-ios.xcworkspace /
-         -scheme lint-test-ios /
-         -sdk iphonesimulator /
+         xcodebuild test \
+         -workspace lint-test-ios.xcworkspace \
+         -scheme lint-test-ios \
+         -sdk iphonesimulator \
          -destination 'platform=ios simulator, name=iphone 14'
          
      
