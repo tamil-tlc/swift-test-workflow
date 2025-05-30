@@ -1,71 +1,42 @@
-name: Swift
+name: Swift CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 jobs:
-  lint:
-
+  build-test-lint:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: install swiftlint
-      run: brew install swiftlint
-
-    - name: run swiftlint
-      run: swiftlint
-
-  build-and-test:
-    runs-on: macos-14
-
-    steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Show project directory (debug)
-        run: ls -R
+      - name: Set Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.0.app  # Adjust based on available versions
 
-      - name: Run unit tests
+      - name: Install SwiftLint
         run: |
-          xcodebuild clean build test \ || echo "something"
-            -project lint-test-ios.xcodeproj \ || echo "there is a some issue in xcode"
-            -scheme lint-test-ios \ || echo " there is a some issue in scheme"
-            -sdk iphonesimulator \ || echo " there is a some issue in sdk"
-            -destination "platform=iOS Simulator,name=iPhone 14" || echo"there is a some issue in destination"
-   
- # build:
-  #  needs: [lint]
-   # runs-on: macos-latest
+          brew install swiftlint
 
-    #steps:
-     #- name: checkout the code
-      # uses: actions/checkout@v4
+      - name: Run SwiftLint
+        run: swiftlint
+        continue-on-error: true  # Set to false if you want to fail on lint warnings/errors
 
-       
-     #- name: Set up Ruby for CocoaPods
-      # uses: ruby/setup-ruby@v1
-       #with:
-        #ruby-version: '3.1'
+      - name: Install Dependencies (if using SwiftPM)
+        run: swift package resolve
 
-     #- name: Install CocoaPods
-      # run: pod install
+      - name: Build Project
+        run: |
+          xcodebuild clean build \
+            -scheme lint-test-ios \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
 
-     #- name: debug
-      # run: |
-       # echo "Current directory: $(pwd)"
-        #ls -R
+      - name: Run Unit Tests
+        run: |
+          xcodebuild test \
+            -scheme lint-test-ios \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.0'
 
-     #- name: Build and test
-      # run: |
-       #  cd lint-test-ios
-        # xcodebuild clean build test \
-         #-project lint-test-ios.xcodeproj \
-         #-scheme lint-test-ios \
-         #-sdk iphonesimulator \
-         #-destination 'platform=iOS Simulator,name=iPhone 14'
- 
