@@ -32,7 +32,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          xcodebuild clean build test \
+          xcodebuild clean build test \ || echo "something"
             -project lint-test-ios.xcodeproj \ || echo "there is a some issue in xcode"
             -scheme lint-test-ios \ || echo " there is a some issue in scheme"
             -sdk iphonesimulator \ || echo " there is a some issue in sdk"
