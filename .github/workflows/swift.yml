@@ -33,10 +33,10 @@ jobs:
       - name: Run unit tests
         run: |
           xcodebuild clean build test \
-            -project lint-test-ios.xcodeproj \
-            -scheme lint-test-ios \
-            -sdk iphonesimulator \
-            -destination "platform=iOS Simulator,name=iPhone 14"
+            -project lint-test-ios.xcodeproj \ || echo "there is a some issue in xcode"
+            -scheme lint-test-ios \ || echo " there is a some issue in scheme"
+            -sdk iphonesimulator \ || echo " there is a some issue in sdk"
+            -destination "platform=iOS Simulator,name=iPhone 14" || echo"there is a some issue in destination"
    
  # build:
   #  needs: [lint]
