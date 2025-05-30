@@ -53,8 +53,14 @@ jobs:
      #- name: Install CocoaPods
       # run: pod install
 
-     - name: Run tests with xcodebuild
+     - name: debug
        run: |
+        echo "Current directory: $(pwd)"
+        ls -R
+
+     - name: Build and test
+       run: |
+         cd lint-test-ios
          xcodebuild clean build test \
          -project lint-test-ios.xcodeproj \
          -scheme lint-test-ios \
