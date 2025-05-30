@@ -30,7 +30,7 @@ jobs:
 
      - name: List schemes
        run: |
-          xcodebuild -list -project lint-test-ios.xcodeproj
+          xcodebuild -list -project lint-test-ios.xcodeproj || echo "list scheme show error"
 
      - name: Run unit tests
        run: |
