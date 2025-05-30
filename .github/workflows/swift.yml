@@ -45,8 +45,12 @@ jobs:
          xcode-version: '15.0.1' 
 
      - name: Run Unit Tests
-       run: swift test
-                  
+       run: |
+        xcodebuild test \
+        -project lint-test-ios/lint-test-ios.xcodeproj \
+        -scheme lint-test-ios \
+        -destination "platform=iOS Simulator,name=iPhone 15,OS=17.4"
+                   
   build:
      needs: [lint, unit-test]
      runs-on: macos-latest
