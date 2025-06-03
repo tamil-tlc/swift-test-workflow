@@ -1,0 +1,66 @@
+name: swift ci
+
+on:
+ push:
+  branches: [ "main", "qa", "dev" ]
+
+env:
+ PROJECT_NAME: 'build-test-ios'
+ SCHEME_NAME: 'build-test-ios'
+ XCODE_VERSION: '16.1'
+  
+jobs:
+ lint:
+  runs-on: macos-latest
+
+  steps:
+   - name: checkout the code
+     uses: actions/checkout@v4
+
+   - name: saved swiftlint cache
+     uses: actions/cache@v4
+     with:
+       path: ~/usr/local/bin/swiftlint
+       key: swiftlint-${{ runner.os }}
+
+    
+   - name: install swiftlint
+     run: brew install swiftlint
+
+
+   - name: test swiftlint
+     run: |
+       swiftlint lint --reporter github-actions-logging --reporter json > swiftlint-report.json || true
+
+   - name: upload artifact
+     uses: actions/upload-artifact@v4
+     if: always()
+     with:
+      name: swiftlint report
+      path: swiftlint-report.json
+
+ unit-test:
+  needs: [lint]
+  runs-on: macos-latest
+  strategy:
+   matrix:
+    destination:
+      - platform=ios-simulater,name=iphone 16,OS='18.1'
+      
+
+  steps:
+    - name: checkout the code
+      uses: actions/checkout@v4
+
+    - name: xcode version
+      uses: maxim-lobanov/setup-xcode@v4
+      with:
+       xcode-version: ${{env.XCODE_VERSION}}
+       
+
+    
+       
+  
+       
+   
+   
