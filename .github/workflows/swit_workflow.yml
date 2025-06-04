@@ -45,8 +45,7 @@ jobs:
   strategy:
    matrix:
     destination:
-      - platform=ios-simulater,name=iphone 16,OS='18.1'
-      
+      -  "platform-ios-simulator_name-iphone16_OS-18.1"
 
   steps:
     - name: checkout the code
