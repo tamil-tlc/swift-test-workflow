@@ -62,22 +62,23 @@ jobs:
        path: ~/Library/Developer/Xcode/DerivedData
        key: ${{ runner.os }}-derived-data-${{ matrix.destination }}-${{ hashFiles('**/*.xcodeproj') }}
 
-    - name: build and test
+    - name: Build and test
       run: |
         set -o pipefail
-        xcodebuild test
-        -project ${{ env.PROJECT-NAME }}.xcodeproj \
-        -scheme ${{ env.SCHEME.NAME }}
+         xcodebuild \
+         -project "$PROJECT_NAME.xcodeproj" \
+        -scheme "$SCHEME_NAME" \
         -destination "${{ matrix.destination }}" \
-        -resultbundlepath Testresult ${{ strategy.job-index}} \
-         enablecodecoverage YES \
-         CODE_SIGNING_REQUIRED=NO \ 
-         CODE_SIGNING_ALLOWED=NO \
-         ONLY_ACTIVE_ARCH=YES \
-         | xcpretty --report junit --output test_results.xml
+        -resultBundlePath "TestResult${{ strategy.job-index }}" \
+        -enableCodeCoverage YES \
+        CODE_SIGNING_REQUIRED=NO \
+        CODE_SIGNING_ALLOWED=NO \
+        ONLY_ACTIVE_ARCH=YES \
+        | xcpretty --report junit --output test_results.xml
 
-    - name: upload test artifact
+    - name: Upload test artifact
       uses: actions/upload-artifact@v4
       with:
        path: test_results.xml
-   
+
+  
