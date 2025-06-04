@@ -44,5 +44,5 @@ jobs:
        CODE_SIGNING_REQUIRED=NO \
        CODE_SIGNING_ALLOWED=NO \
        ONLY_ACTIVE_ARCH=YES \
-       | xcpretty --report junit --output test-result.xml
+       | xcpretty --report junit --output test-result.json
       
