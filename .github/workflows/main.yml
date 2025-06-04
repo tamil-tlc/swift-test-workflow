@@ -43,7 +43,6 @@ jobs:
         -scheme lint-test-ios \
         -destination "${{ matrix.destination }}" \
         -resultBundlePath Testresults-${{ strategy.job-index }} \
-        -enableCodeCoverage YES \
         CODE_SIGNING_REQUIRED=NO \
         CODE_SIGNING_ALLOWED=NO \
         CODE_SIGN_IDENTITY="" \
