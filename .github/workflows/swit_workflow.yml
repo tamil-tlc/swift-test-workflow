@@ -56,12 +56,6 @@ jobs:
       with:
        xcode-version: ${{env.XCODE_VERSION}}
 
-    - name: cache derived data
-      uses: actions/cache@v4
-      with:
-       path: ~/Library/Developer/Xcode/DerivedData
-       key: ${{ runner.os }}-derived-data-${{ matrix.destination }}-${{ hashFiles('**/*.xcodeproj') }}
-
     - name: Build and test
       run: |
         set -o pipefail
