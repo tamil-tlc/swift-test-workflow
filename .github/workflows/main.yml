@@ -38,10 +38,10 @@ jobs:
        xcodebuild \
        -project lint-test-ios/lint-test-ios.xcodeproj \
        -scheme  lint-test-ios \
-       -destination "${{ matrix.destination }} \
+       -destination "${{ matrix.destination }}" \
        -resultbundlepath Testresults-${{ strategy.job-index }} \
        enableCodeCoverage YES \
-       CODE_SIGNING_REQUEIRED=NO \
+       CODE_SIGNING_REQUIRED=NO \
        CODE_SIGNING_ALLOWED=NO \
        ONLY_ACTIVE_ARCH=YES \
        | xcpretty --report junit --output test-result.xml
