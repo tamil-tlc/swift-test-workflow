@@ -25,7 +25,7 @@ jobs:
    strategy:
      matrix:
       destination: 
-        - platform=iOS Simulator,name=iPhone 15,OS=17.4
+        - destination "platform=visionOS Simulator,id=6B240C3E-0355-4A8E-8FD7-4F2B48B7F341,OS=2.2"
         
    steps:
     - name: checkout the code
