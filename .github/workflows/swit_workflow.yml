@@ -64,7 +64,7 @@ jobs:
 
     - name: build and test
       run: |
-        set -o pipefaile
+        set -o pipefail
         xcodebuild test
         -project ${{ env.PROJECT-NAME }}.xcodeproj \
         -scheme ${{ env.SCHEME.NAME }}
