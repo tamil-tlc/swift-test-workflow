@@ -11,7 +11,7 @@ env:
   
 jobs:
  lint:
-  runs-on: macos-latest
+  runs-on: macos-14
 
   steps:
    - name: checkout the code
@@ -45,7 +45,7 @@ jobs:
   strategy:
    matrix:
     destination:
-      -  "platform-ios-simulator_name-iphone16_OS-18.1"
+      - platform=iOS Simulator,name=iPhone 15,OS=17.4
 
   steps:
     - name: checkout the code
