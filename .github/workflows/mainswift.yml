@@ -1,0 +1,17 @@
+name: swift project
+
+on:
+ push:
+  branches:
+   - main
+   - master
+
+jobs:
+ build:
+  runs-on: macos-latest
+
+  steps:
+   - name: checkout the code
+     uses: actions/checkout@v4
+
+     
