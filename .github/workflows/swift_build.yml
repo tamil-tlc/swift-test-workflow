@@ -17,11 +17,11 @@ jobs:
    - name: set up swift
      run: swift --version
 
-   - name: build swift code
-     run: swift build -v
+   - name: compile with swiftc
+     run: swiftc main.swift o- output
 
-   - name: run swift code
-     run: swift run -v
+   - name: run the compiled program
+     run: ./output
 
     
    
