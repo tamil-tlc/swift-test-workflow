@@ -1,0 +1,27 @@
+name: swift ci workflow
+
+on:
+ push:
+  branches:
+   - main
+   - master
+
+jobs:
+ build:
+  runs-on: macos-latest
+
+  steps:
+   - name: checkout the code
+     uses: actions/checkout@v4
+
+   - name: set up swift
+     run: swift --version
+
+   - name: build swift code
+     run: swift build -v
+
+   - name: run swift code
+     run: swift run -v
+
+    
+   
