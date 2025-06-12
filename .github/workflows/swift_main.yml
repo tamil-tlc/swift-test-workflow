@@ -1,0 +1,204 @@
+name: Swift CI Workflow
+
+on:
+  push:
+    branches: [ "main", "dev", "qa" ]
+  pull_request:
+    branches: [ "main", "dev", "qa", "feature/*", "release/*" ]
+
+env:
+  XCODE_VERSION: '16.1'
+  PROJECT_NAME: 'build-test-ios'
+  SCHEME_NAME: 'build-test-ios'
+
+permissions:
+  contents: write
+
+jobs:
+  lint:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Cache SwiftLint
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/swiftlint
+          key: swiftlint-${{ runner.os }}
+          
+      - name: Install SwiftLint
+        run: |
+          if ! command -v swiftlint &> /dev/null; then
+            brew install swiftlint
+          fi
+          
+      - name: Run SwiftLint
+        run: |
+         swiftlint lint --reporter github-actions-logging --reporter json > swiftlint-report.json || true
+          
+      - name: Upload SwiftLint Results
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: swiftlint-results
+          path: swiftlint-report.json
+
+  test:
+    needs: [lint]
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination: 
+          - "platform=iOS Simulator,name=iPhone 16,OS=18.1"
+           
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+          
+      - name: Cache Swift Package Manager
+        uses: actions/cache@v4
+        with:
+         path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ~/.swiftpm
+         key: ${{ runner.os }}-spm-${{ hashFiles('**/*.xcodeproj', '**/Package.swift') }}
+            
+      - name: Build and Test
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project ${{ env.PROJECT_NAME }}.xcodeproj \
+            -scheme ${{ env.SCHEME_NAME }} \
+            -destination "${{ matrix.destination }}" \
+            -resultBundlePath TestResults-${{ strategy.job-index }} \
+            -enableCodeCoverage YES \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty --report junit --output test-results.xml
+            
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+           name: build-artifacts-${{ matrix.configuration }}
+           path: |
+               ~/Library/Developer/Xcode/DerivedData/**/Build/Products/**/*.app
+            
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports-${{ strategy.job-index }}
+          path: TestResults-${{ strategy.job-index }}.xcresult
+
+      - name: Upload .xcresult bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults
+          path: TestResult${{ strategy.job-index }}.xcresult
+
+  build:
+    needs: [lint, test]
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{ env.XCODE_VERSION }}
+          
+      - name: Cache derived data
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: ${{ runner.os }}-derived-data-${{ matrix.configuration }}-${{ hashFiles('**/*.xcodeproj') }}
+          restore-keys: |
+            ${{ runner.os }}-derived-data-${{ matrix.configuration }}-
+            ${{ runner.os }}-derived-data-
+            
+      - name: Build for iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild clean build \
+            -project ${{ env.PROJECT_NAME }}.xcodeproj \
+            -scheme ${{ env.SCHEME_NAME }} \
+            -configuration ${{ matrix.configuration }} \
+            -destination "platform=iOS Simulator,name=iPhone 16,OS=18.1" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            | xcpretty
+
+  version-and-release:
+    needs: [build]
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set version from Info.plist
+        id: bump_version
+        run: |
+          plist="build-test-ios/sample_Info.plist"
+          version=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$plist")
+          IFS='.' read -r major minor patch <<< "$version"
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+          echo "Bumping version: $version → $new_version"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $new_version" "$plist"
+          build_number=$(date +%s)
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build_number" "$plist"
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+          echo "build=$build_number" >> $GITHUB_OUTPUT
+
+      - name: Commit and push version bump
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Bump version to ${{ steps.bump_version.outputs.version }} (build ${{ steps.bump_version.outputs.build }}) [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Generate branch-based release notes
+        id: notes
+        run: |
+          BRANCH_NAME="${GITHUB_REF##*/}"
+          VERSION=${{ steps.bump_version.outputs.version }}
+          PROJECT="${{ env.PROJECT_NAME }}"
+
+          if [[ "$BRANCH_NAME" == "dev" ]]; then
+            NOTES="Release for DEV branch\n\nProject: $PROJECT\nVersion: $VERSION\n\nCommits:\n"
+            NOTES+=$(git log --pretty=format:"- %h %s (%an)" -10)
+          elif [[ "$BRANCH_NAME" == "qa" ]]; then
+            NOTES="QA Release\n\nProject: $PROJECT\nVersion: $VERSION"
+          else
+            NOTES="Production release version $VERSION"
+          fi
+
+          echo "$NOTES"
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.bump_version.outputs.version }}
+          name: v${{ steps.bump_version.outputs.version }}
+          body: ${{ env.RELEASE_NOTES }}
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
