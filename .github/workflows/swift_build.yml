@@ -18,7 +18,7 @@ jobs:
      run: swift --version
 
    - name: compile with swiftc
-     run: swiftc main.swift o- output
+     run: swiftc ContentView.swift o- output
 
    - name: run the compiled program
      run: ./output
